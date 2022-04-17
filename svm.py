@@ -65,21 +65,33 @@ def plot_contours(ax, clf, xx, yy, **params):
     out = ax.contourf(xx, yy, Z, **params)
     return out
 
-C_hard = 1000000.0  # SVM regularization parameter
-C = 10
-n = 100
+if __name__=="__main__":
+
+    C_hard = 1000000.0  # SVM regularization parameter
+    C = 10
+    n = 100
+
+    # Data is labeled by a circle
+
+    radius = np.hstack([np.random.random(n), np.random.random(n) + 1.5])
+    angles = 2 * math.pi * np.random.random(2 * n)
+    X1 = (radius * np.cos(angles)).reshape((2 * n, 1))
+    X2 = (radius * np.sin(angles)).reshape((2 * n, 1))
+
+    X = np.concatenate([X1,X2],axis=1)
+    y = np.concatenate([np.ones((n,1)), -np.ones((n,1))], axis=0).reshape([-1])
+    idx = (np.random.rand(200)<0.1).nonzero()[0]
+    y[idx[idx>100]] = 1
+
+    # qa_linear = svm.SVC(kernel="linear", coef0=1)
+    qa_deg2 = svm.SVC(kernel="poly", degree=2, coef0=1)
+    # qa_deg3 = svm.SVC(kernel="poly", degree=3, coef0=1)
+    rbf = svm.SVC(kernel="rbf", gamma=10)
+    estimators = [qa_deg2.fit(X,y), rbf.fit(X,y)]
+    estimators_names = ["Deg 2 poly. kernel", "RBF"]
+    plot_results(estimators, estimators_names, X, y)
 
 
-
-# Data is labeled by a circle
-
-radius = np.hstack([np.random.random(n), np.random.random(n) + 1.5])
-angles = 2 * math.pi * np.random.random(2 * n)
-X1 = (radius * np.cos(angles)).reshape((2 * n, 1))
-X2 = (radius * np.sin(angles)).reshape((2 * n, 1))
-
-X = np.concatenate([X1,X2],axis=1)
-y = np.concatenate([np.ones((n,1)), -np.ones((n,1))], axis=0).reshape([-1])
 
 
 
